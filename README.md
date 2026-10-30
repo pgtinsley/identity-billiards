@@ -5,6 +5,8 @@ recognizer continues to match a fixed reference. **Identity Playground** is the
 browser interface: choose a generated face or project an uploaded photo, then
 watch a trajectory bounce off an identity-similarity boundary.
 
+![Identity Billiards demo showing a trajectory bouncing off an identity-similarity boundary](billiard.gif)
+
 The current experiment uses NVIDIA's **StyleGAN2 FFHQ 256×256** checkpoint in the
 StyleGAN3 runtime, with InsightFace `buffalo_l` detection and recognition. It is
 a research prototype for exploring a matcher's acceptance region.
