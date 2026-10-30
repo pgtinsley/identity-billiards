@@ -1,35 +1,26 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report a reproducible Identity Playground or experiment problem
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Expected and observed behavior
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. In '...' directory, run command '...'
-2. See error (copy&paste full log, including exceptions and **stacktraces**).
+Describe what you expected and what happened.
 
-Please copy&paste text instead of screenshots for better searchability.
+## Reproduction
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+Include commands or UI steps and the relevant settings (start mode, threshold,
+step size, reflection policy, and seeds).
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## Environment and checks
 
-**Desktop (please complete the following information):**
- - OS: [e.g. Linux Ubuntu 20.04, Windows 10]
- - PyTorch version (e.g., pytorch 1.9.0)
- - CUDA toolkit version (e.g., CUDA 11.4)
- - NVIDIA driver version
- - GPU [e.g., Titan V, RTX 3090]
- - Docker: did you use Docker?  If yes, specify docker image URL (e.g., nvcr.io/nvidia/pytorch:21.08-py3)
+- Project revision:
+- OS, Python, and GPU:
+- Output of the environment/smoke check:
+- Relevant error or collision diagnostics:
 
-**Additional context**
-Add any other context about the problem here.
+Remove session tokens and private file paths. Attach face images and generated
+results only if you intend them to be public.

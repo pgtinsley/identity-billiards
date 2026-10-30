@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this project, cite this repository and the upstream methods described in experiments/README.md."
+title: "Identity Billiards: Exploring Face Recognition Regions in Generative Latent Space"
+type: software
+authors:
+  - family-names: Tinsley
+    given-names: Patrick Gordon
+repository-code: "https://github.com/pgtinsley/identity-billiards"
+url: "https://github.com/pgtinsley/identity-billiards"

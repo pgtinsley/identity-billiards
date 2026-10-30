@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Identity Playground</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23245e4b'/%3E%3Ccircle cx='32' cy='32' r='19' stroke='%23f4f3ee' stroke-width='3' fill='none'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23f4f3ee'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Identity Playground home"><span class="brand-mark">◎</span><span>Identity <strong>Playground</strong></span></a>
+    <div class="top-meta"><span class="chip">Shared W · 2D slice</span><span id="device" class="device">GPU loads on first use</span></div>
+  </header>
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-heading"><p class="eyebrow">EXPERIMENT CONTROLS</p><h1>A face. A boundary.<br>A little curiosity.</h1><p>See how far a face can move while its identity still matches.</p></div>
+      <fieldset id="controls">
+        <section class="control-section">
+          <h2><span>01</span> Starting image</h2>
+          <div class="segments" role="group" aria-label="Starting image mode">
+            <label><input type="radio" name="mode" value="mean" checked><span>Learned mean</span></label>
+            <label><input type="radio" name="mode" value="seed"><span>Seed</span></label>
+            <label><input type="radio" name="mode" value="image"><span>Upload</span></label>
+          </div>
+          <p id="mode-description" class="hint">Start at the generator’s learned average W vector. The center stays fixed.</p>
+          <div id="seed-options" hidden><label class="field-label" for="anchor-seed">Image seed</label><input id="anchor-seed" type="number" value="23" min="0" max="2147483647"></div>
+          <div id="upload-options" hidden>
+            <label id="dropzone" class="dropzone" for="photo"><span class="upload-icon">↥</span><strong>Choose a face photo</strong><span id="file-name">or drop one here · JPG, PNG, WebP</span><input id="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>
+            <label class="field-label" for="projection-steps">Projection quality</label>
+            <select id="projection-steps"><option value="100">Quick · 100 steps</option><option value="250" selected>Balanced · 250 steps</option><option value="500">Thorough · 500 steps</option><option value="1000">Extended · 1000 steps</option></select>
+            <label class="check"><input id="already-aligned" type="checkbox">Photo is already an FFHQ-aligned crop</label>
+            <p class="hint">Selecting a photo previews it locally. Then click Align &amp; project photo to upload it, align one detected face and fit a shared W vector.</p>
+          </div>
+          <button id="prepare" class="secondary full" type="button"><span id="prepare-label">Prepare starting face</span><span>↗</span></button>
+        </section>
+        <section class="control-section">
+          <h2><span>02</span> Step size</h2>
+          <div class="range-heading"><label for="step-size">Distance traveled each frame</label><output id="step-value" for="step-size">0.07</output></div>
+          <input id="step-size" type="range" min="0.01" max="0.40" value="0.07" step="0.01">
+          <div class="range-labels"><span>Gentle motion</span><span>Longer jumps</span></div>
+        </section>
+        <section class="control-section">
+          <h2><span>03</span> Identity boundary</h2>
+          <div class="range-heading"><label for="distance">Maximum cosine distance</label><output id="distance-value" for="distance">0.55</output></div>
+          <input id="distance" type="range" min="0.05" max="0.90" value="0.55" step="0.01">
+          <div class="range-labels"><span>Tighter match</span><span>More variation</span></div>
+          <div class="threshold-note">Minimum similarity <strong id="similarity-value">0.45</strong><span>distance = 1 − similarity</span></div>
+          <p class="hint">0.55 follows upstream buffalo_l defaults. This is a matching rule, not a probability or a guarantee of identity.</p>
+        </section>
+        <section class="control-section">
+          <h2><span>04</span> Reflection policy</h2>
+          <div class="policies" role="group" aria-label="Reflection policy">
+            <label><input type="radio" name="policy" value="mirror" checked><span><b>↗</b> Mirror</span></label>
+            <label><input type="radio" name="policy" value="random_inward"><span><b>↻</b> Random inward</span></label>
+            <label><input type="radio" name="policy" value="center"><span><b>◎</b> Toward center</span></label>
+            <label><input type="radio" name="policy" value="grazing"><span><b>⌁</b> Glide</span></label>
+          </div>
+          <p id="policy-description" class="hint">Reflect around the local identity-boundary normal; preserves the tangential component.</p>
+        </section>
+        <section class="control-section last-section">
+          <div class="inline-fields"><div><label class="field-label" for="duration">Video length</label><select id="duration"><option value="4">4 seconds</option><option value="6" selected>6 seconds</option><option value="10">10 seconds</option><option value="20">20 seconds</option><option value="30">30 seconds</option></select></div><div><label class="field-label" for="grid-size">Map detail</label><select id="grid-size"><option value="17">Quick · 17²</option><option value="25" selected>Balanced · 25²</option><option value="41">Fine · 41²</option></select></div></div>
+          <details><summary>Advanced settings</summary><div class="inline-fields"><div><label class="field-label" for="trajectory-seed">Motion seed</label><input id="trajectory-seed" type="number" value="11" min="0" max="2147483647"></div><div><label class="field-label" for="extent">Map half-width</label><input id="extent" type="number" value="3" min="1" max="6" step="0.5"></div></div><p class="hint">Coordinates use standardized W principal axes. Every frame is matched to the fixed reference.</p></details>
+        </section>
+      </fieldset>
+      <div class="run-actions"><button id="run" class="primary full" type="button" disabled>Generate trajectory <span>→</span></button><p id="run-hint" class="hint center-text">Prepare a starting face first.</p></div>
+    </aside>
+    <div class="workspace">
+      <div class="workspace-heading"><div><p class="eyebrow">STYLEGAN × ARCFACE</p><h2>Explore an identity’s edge.</h2></div><span id="ready-badge" class="chip muted">Preparing your playground</span></div>
+      <div id="error" class="notice error" role="alert" hidden></div>
+      <section id="progress-card" class="progress-card" hidden aria-live="polite"><div><span class="working-dot"></span><strong id="stage">Starting</strong><span id="progress-value">0%</span><button id="cancel" type="button" class="text-button">Cancel</button></div><progress id="progress" max="1" value="0"></progress><p>GPU work continues here while the controls wait. Keep your allocation and SSH tunnel open.</p></section>
+      <section class="starting-card">
+        <div class="section-heading"><h3>Starting point</h3><span id="center-label" class="small-label">Learned W mean</span></div>
+        <div class="starting-content">
+          <div class="portrait"><div id="reference-placeholder" class="portrait-placeholder">◎</div><img id="reference-image" alt="Fixed identity reference" hidden><span id="reference-caption">Fixed reference</span></div>
+          <div class="portrait"><div id="reconstruction-placeholder" class="portrait-placeholder">↗</div><img id="reconstruction-image" alt="Generated starting face at the latent center" hidden><span>Generated center</span></div>
+          <div class="starting-explanation"><p class="eyebrow">ONE FIXED IDENTITY REFERENCE</p><h3 id="center-title">Start with the learned mean.</h3><p id="center-description">A two-dimensional slice through shared W. Change the starting point, then explore how the face moves inside its match boundary.</p><div id="projection-score" class="projection-score" hidden></div><a id="download-projection" class="small-link" hidden>Download projected W ↗</a></div>
+        </div>
+        <p id="projection-warning" class="notice warning" hidden></p>
+      </section>
+      <section class="result-card">
+        <div class="section-heading"><div><h3 id="result-title">Your experiment starts here</h3><p id="result-caption">Prepare a face, choose a boundary, and generate a trajectory.</p></div><span id="result-tag" class="chip muted">Awaiting a run</span></div>
+        <div id="empty-state" class="empty-state"><svg viewBox="0 0 360 240" aria-hidden="true"><defs><pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="currentColor" stroke-width=".6" opacity=".22"/></pattern></defs><rect width="360" height="240" fill="url(#grid)"/><path d="M146 46 C215 28 277 80 247 146 C232 193 164 215 123 168 C83 129 92 68 146 46Z" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="5 7" opacity=".5"/><path d="M181 122 L229 83 L135 166 L116 104" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".6"/><circle cx="181" cy="122" r="4" fill="currentColor"/><circle cx="116" cy="104" r="9" fill="currentColor"/></svg><h3>Follow the face. Find the boundary.</h3><p>Your rendered face, live path and similarity scores will appear together in the video.</p><span>Illustration · your measured boundary will be generated</span></div>
+        <video id="video" controls playsinline preload="metadata" hidden></video>
+        <div id="result-content" hidden>
+          <div class="stats"><div><span>Lowest similarity</span><strong id="stat-score">—</strong></div><div><span>Collisions</span><strong id="stat-collisions">—</strong></div><div><span>Diverse representatives</span><strong id="stat-diversity">—</strong></div><div><span>Fallback bounces</span><strong id="stat-fallbacks">—</strong></div></div>
+          <p class="stat-footnote">Representatives use a 0.05 embedding cosine-distance cutoff. Counts depend on the path and sample budget.</p>
+          <div class="result-actions"><a id="download-video" class="primary" download>Download MP4 ↓</a><a id="download-data" class="secondary">Trajectory data</a><a id="download-metadata" class="small-link">Metadata ↗</a></div>
+          <details class="map-details"><summary>Inspect boundary map and diagnostics</summary><img id="map-image" alt="Measured identity similarity map and trajectory"><p id="diagnostics" class="hint"></p><a id="download-map" class="small-link" download>Download boundary map ↗</a></details>
+        </div>
+      </section>
+      <section id="history-section" class="history-section" hidden><div class="section-heading"><h3>This session</h3><span class="small-label">Compare your runs</span></div><div id="history" class="history"></div></section>
+      <footer>StyleGAN2 FFHQ 256 × 256 · InsightFace buffalo_l · Shared W, fixed synthesis noise.<br>Physics dynamics and source-to-target paths are reserved for a later iteration.</footer>
+    </div>
+  </main>
+</body>
+</html>

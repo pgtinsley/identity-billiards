@@ -1,0 +1,45 @@
+.venv/
+.uv-cache/
+.uv-python/
+__pycache__/
+.ipynb_checkpoints/
+models/
+outputs/
+*.egg-info/
+.browser-cache/
+dist/
+
+# Local credentials and machine-specific settings.
+.env
+.env.*
+!.env.example
+.aws/
+.codex/
+.agents/
+.ssh/
+*.pem
+*.key
+
+# Build products, test caches, and editor/OS files.
+build/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.py[cod]
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.log
+
+# Downloaded weights and generated media belong in local models/ and outputs/.
+*.pkl
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.npz
+*.mp4
+*.zip
+*.tar.gz
